@@ -6,7 +6,8 @@ faiss-cpu
 python-dotenv
 rank-bm25
 groq
-pyarrow==13.0.0
+setuptools
+pyarrow>=13.0.0
 pymongo
 bcrypt
 gunicorn
