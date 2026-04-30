@@ -11,8 +11,8 @@ load_dotenv()
 app = FastAPI()
 
 # Enable CORS for frontend communication
-frontend_url = os.getenv("FRONTEND_URL", "*")
-origins = [frontend_url] if frontend_url != "*" else ["*"]
+# Temporarily allowing all origins to debug connection issues
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +21,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    print(f"Incoming request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    print(f"Response status: {response.status_code}")
+    return response
 
 @app.get("/")
 def read_root():
