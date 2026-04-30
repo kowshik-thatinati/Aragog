@@ -20,41 +20,38 @@ if not GROQ_API_KEY:
     raise ValueError("GROQ_API_KEY missing")
 
 # -----------------------------
-# GLOBALS (LAZY LOAD)
+# GLOBALS (PRE-LOAD FOR MEMORY)
 # -----------------------------
-embed_model = None
-reranker = None
-client = None
-index = None
-chunks = None
-bm25 = None
-_initialized = False
+print("🚀 Initializing RAG system (Memory Optimized)...")
 
-# -----------------------------
-# INITIALIZATION
-# -----------------------------
-def initialize_models():
-    global embed_model, reranker, client, index, chunks, bm25, _initialized
-
-    if _initialized:
-        return
-
-    print("🚀 Initializing RAG system...")
-
+# Load models at top level to detect OOM early
+try:
     embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-    reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+    # reranker removed to save ~150MB RAM
     client = Groq(api_key=GROQ_API_KEY)
 
+    print("📦 Loading data files...")
     index = faiss.read_index(os.path.join(DATA_DIR, "faiss_index.index"))
 
+    # Loading chunks more efficiently
     with open(os.path.join(DATA_DIR, "chunks_structured.json"), "r", encoding="utf-8") as f:
         chunks = json.load(f)
 
+    print("🔍 Building BM25 index...")
     tokenized_chunks = [chunk.lower().split() for chunk in chunks]
     bm25 = BM25Okapi(tokenized_chunks)
+    
+    # Clear tokenized_chunks from memory after building index
+    del tokenized_chunks
+    
+    print("✅ System ready and optimized")
+except Exception as e:
+    print(f"❌ Initialization failed: {e}")
+    raise e
 
-    _initialized = True
-    print("✅ System ready")
+def initialize_models():
+    # Now a no-op since we initialize at top level
+    pass
 
 # -----------------------------
 # CLEAN TEXT
@@ -141,7 +138,8 @@ def is_relevant_context(query, docs, threshold=0.45):
 # -----------------------------
 def retrieve_context(query):
     candidates = retrieve_candidates(query)
-    top_docs = rerank(query, candidates, top_n=5)
+    # Reranking removed for memory optimization
+    top_docs = candidates[:5]
 
     unique_docs = list(dict.fromkeys(top_docs))
 
