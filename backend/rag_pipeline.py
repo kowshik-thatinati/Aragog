@@ -47,7 +47,7 @@ def initialize_models():
 
     index = faiss.read_index(os.path.join(DATA_DIR, "faiss_index.index"))
 
-    with open(os.path.join(DATA_DIR, "chunks.json"), "r", encoding="utf-8") as f:
+    with open(os.path.join(DATA_DIR, "chunks_structured.json"), "r", encoding="utf-8") as f:
         chunks = json.load(f)
 
     tokenized_chunks = [chunk.lower().split() for chunk in chunks]
