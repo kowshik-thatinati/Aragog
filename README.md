@@ -105,6 +105,7 @@ xyz/
 │ ├── auth.py
 │ ├── rag_pipeline.py
 │ ├── data/
+│ │ ├── chunks.json
 │ │ ├── chunks_structured.json
 │ │ └── faiss_index.index
 │

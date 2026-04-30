@@ -9,3 +9,4 @@ groq
 pyarrow==13.0.0
 pymongo
 bcrypt
+gunicorn

@@ -3,6 +3,8 @@ import { Send, User, AlertTriangle, BookOpen, Shield, Activity } from 'lucide-re
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+
 function ChatPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -83,7 +85,7 @@ function ChatPage() {
     setLoadingStage('intake')
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/chat', {
+      const response = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +126,7 @@ function ChatPage() {
         {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content: 'I could not reach the backend. Please make sure FastAPI is running on port 8000.',
+          content: 'I could not reach the backend. Please check the API URL and server status.',
           done: true,
           isError: true,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
