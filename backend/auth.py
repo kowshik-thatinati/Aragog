@@ -23,7 +23,14 @@ def get_db():
             print("Connecting to MongoDB...")
             _client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
             _client.admin.command('ping')
-            _db = _client.get_default_database()
+            try:
+                _db = _client.get_default_database()
+            except:
+                _db = _client["aragog"]
+            
+            if _db is None:
+                _db = _client["aragog"]
+                
             _users_collection = _db["users"]
             print("✓ MongoDB connected successfully")
         except PyMongoError as e:
